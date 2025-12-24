@@ -1,0 +1,41 @@
+services: 
+  mysql: 
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports: 
+      - "3306:3306"
+    volumes: 
+      - mysql_data:/var/lib/mysql
+    networks:
+      - challenge_network
+
+  api:
+    build: 
+      context: .
+    container_name: api_container
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports: 
+      - "${APP_PORT}:3000"
+    depends_on: 
+      - mysql
+    networks:
+      - challenge_network
+
+networks:
+  challenge_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
